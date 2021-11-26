@@ -1,0 +1,47 @@
+version: '3.8'
+#Definimos los servicios que vamos a utilizar
+services:
+  #Creamos el servicio para la base de datos
+  postgres_pc2:
+    container_name: postgres_pc2
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pc2_db
+    volumes:
+      - ./pythonApp/init_script.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    networks:
+      - app
+  #Creamos el servicio para la el cuaderno de jupyter-notebook
+  jupyter-notebook:
+    image: continuumio/anaconda3
+    command: jupyter notebook --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token='' --NotebookApp.password=''
+    container_name: jupyter-notebook
+    networks:
+      - app
+    depends_on:
+      - postgres_pc2
+    volumes:
+      - ./notebooks:/notebooks
+    ports:
+      - 8888:8888
+  #Creamos el servicio para el despliegue de la aplicacion
+  dash:
+    build: ./pythonApp
+    depends_on:
+      - postgres_pc2
+    container_name: dash
+    networks:
+      - app
+    ports:
+      - 8060:8060
+    environment:
+      - VIRTUAL_HOST=dash.arthoughts.local
+    restart: on-failure
+#Red a la que van a estar conectador lo contenedores
+networks:
+  app:
+    driver: bridge
