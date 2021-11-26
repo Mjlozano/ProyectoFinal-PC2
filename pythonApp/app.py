@@ -1,26 +1,21 @@
-# importing main libraries
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import pandas as pd
 import flask
 import plotly.express as px
 from sqlalchemy import create_engine
 import dash
 
-# external stylesheets for dash style
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-engine = create_engine('postgresql://postgres:password@postgres_pc2:5432/pc2_db') # extracting engine for collect database connection
-df = pd.read_sql_table("iris", engine) # extract data information from database and converting it into a pandas dataframe
+engine = create_engine('postgresql://postgres:password@postgres_pc2:5432/pc2_db')
+df = pd.read_sql_table("iris", engine)
 
-
-app = dash.Dash(__name__, server=server,external_stylesheets=external_stylesheets) # creating dash instance
-server = app.server
-#app.config.suppress_callback_exceptions = True # ignoring some not necessary alerts from dash callbacks
+server = flask.Flask(__name__)
+app = dash.Dash(__name__, server=server,external_stylesheets=external_stylesheets,suppress_callback_exceptions=True)
 
 app.layout = html.Div(children=[
-
-    html.H1("Iris Flower Dataset"),
+     html.H1("Iris Flower Dataset"),
 
     html.H4("Scatter Plot"),
     dcc.Graph(
@@ -41,6 +36,6 @@ app.layout = html.Div(children=[
     )
 ])
 
-# running all program
+
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0',debug=False, port=8060)
+    app.run_server(host='0.0.0.0',debug=True, port=8060)

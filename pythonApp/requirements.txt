@@ -8,3 +8,5 @@ plotly
 sqlalchemy
 psycopg2-binary
 psycopg2
+statsmodels
+scipy
